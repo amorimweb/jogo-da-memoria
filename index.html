@@ -5,25 +5,43 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
 <title>Cantinho dos Jogos 🎉</title>
 <style>
-  :root{ --radius:22px; }
+  :root{
+    --radius:22px;
+    --sky-top:#7ec8f2;
+    --sky-bottom:#cdeffd;
+    --grass:#8bd17c;
+    --grass-dark:#6cb75e;
+  }
   *{box-sizing:border-box;}
   body{
     margin:0;
     min-height:100vh;
     font-family:'Comic Sans MS', 'Trebuchet MS', Arial, sans-serif;
-    background:linear-gradient(135deg,#ff9a9e 0%,#fecfef 30%,#a1c4fd 60%,#ffecd2 100%);
-    background-size:400% 400%;
-    animation:bgMove 18s ease infinite;
+    background:linear-gradient(var(--sky-top), var(--sky-bottom) 60%, var(--grass) 60%, var(--grass-dark) 100%);
     color:#2d2d4d;
     display:flex;
     flex-direction:column;
     align-items:center;
     padding:24px 16px;
+    position:relative;
+    overflow-x:hidden;
   }
-  @keyframes bgMove{
-    0%{background-position:0% 50%;}
-    50%{background-position:100% 50%;}
-    100%{background-position:0% 50%;}
+  .hero-banner{
+    width:100%;
+    max-width:900px;
+    height:clamp(140px, 28vw, 260px);
+    flex-shrink:0;
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+    margin-bottom:8px;
+    border:4px solid #fff8;
+  }
+  .hero-banner img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
   }
   h1{
     font-size:clamp(28px,6vw,46px);
@@ -89,12 +107,6 @@
     padding:4px 12px;
     border-radius:20px;
   }
-  .coming-soon{
-    opacity:0.6;
-    pointer-events:none;
-    border-style:dashed;
-    border-color:#ccc;
-  }
   .footer-note{
     color:#fff;
     text-shadow:1px 1px 3px rgba(0,0,0,0.3);
@@ -105,6 +117,10 @@
 </style>
 </head>
 <body>
+
+<div class="hero-banner">
+  <img src="assets/playground-bg.png" alt="Ilustração de um parquinho colorido com escorregador, balanço e gangorra">
+</div>
 
 <h1>🎮 Cantinho dos Jogos 🎮</h1>
 <p class="subtitle">Escolha um jogo para brincar com a família!</p>
@@ -124,11 +140,13 @@
     <span class="tag">👥 Local ou 🌐 Online</span>
   </a>
 
-  <div class="game-card coming-soon">
-    <span class="emoji">✨</span>
-    <h2>Em breve...</h2>
-    <p>Novos jogos chegando aos poucos!</p>
-  </div>
+  <a class="game-card" href="silabas/index.html">
+    <span class="emoji">🔤</span>
+    <h2>Mundo das Sílabas</h2>
+    <p>Monte palavras e caçe sílabas para aprender a ler brincando!</p>
+    <span class="tag">👥 Local</span>
+  </a>
+
 </div>
 
 <p class="footer-note">Feito com 💖 para a família</p>
