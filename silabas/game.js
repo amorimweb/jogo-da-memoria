@@ -227,10 +227,24 @@ function startBuildGame() {
   loadBuildRound();
 }
 
+function getDistractorSyllables(excludeSyllables, count) {
+  const allSyllables = [].concat(WORD_BANK[2], WORD_BANK[3], WORD_BANK[4])
+    .flatMap(w => w.syllables);
+  const excludeSet = new Set(excludeSyllables);
+  const candidates = [...new Set(allSyllables)].filter(s => !excludeSet.has(s));
+  return shuffle(candidates).slice(0, count);
+}
+
 function loadBuildRound() {
   state.buildCurrentWord = state.buildWordPool[state.buildRound];
   state.buildAnswer = [];
-  state.buildTileOrder = shuffle(state.buildCurrentWord.syllables.map((s, i) => ({ syllable: s, origIndex: i, used: false })));
+
+  const correctSyllables = state.buildCurrentWord.syllables;
+  const distractorCount = Math.min(3, correctSyllables.length);
+  const distractors = getDistractorSyllables(correctSyllables, distractorCount);
+  const allTiles = correctSyllables.map(s => ({ syllable: s, correct: true }))
+    .concat(distractors.map(s => ({ syllable: s, correct: false })));
+  state.buildTileOrder = shuffle(allTiles).map(t => Object.assign({ used: false }, t));
 
   document.getElementById("word-emoji").textContent = state.buildCurrentWord.emoji;
   document.getElementById("build-round-counter").textContent =
@@ -266,6 +280,7 @@ function renderTiles() {
 }
 
 function onTileClick(tileIdx) {
+  if (state.buildAnswer.length >= state.buildCurrentWord.syllables.length) return;
   const tile = state.buildTileOrder[tileIdx];
   if (tile.used) return;
   tile.used = true;

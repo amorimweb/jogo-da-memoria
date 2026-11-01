@@ -26,22 +26,22 @@
     position:relative;
     overflow-x:hidden;
   }
-  .hero-banner{
-    width:100%;
-    max-width:900px;
-    height:clamp(140px, 28vw, 260px);
-    flex-shrink:0;
-    border-radius:var(--radius);
-    overflow:hidden;
-    box-shadow:0 10px 30px rgba(0,0,0,0.25);
-    margin-bottom:8px;
-    border:4px solid #fff8;
+  .scenery-bg{
+    position:fixed;
+    inset:0;
+    z-index:-2;
+    background-image:url('assets/playground-bg.png');
+    background-size:cover;
+    background-position:center bottom;
+    background-repeat:no-repeat;
+    filter:blur(1.5px) saturate(1.15) brightness(1.03);
+    transform:scale(1.03);
   }
-  .hero-banner img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
+  .scenery-overlay{
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    background:linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.25) 35%, rgba(255,255,255,0.45) 100%);
   }
   h1{
     font-size:clamp(28px,6vw,46px);
@@ -52,9 +52,9 @@
   }
   .subtitle{
     text-align:center;
-    color:#fff;
+    color:#2d2d4d;
     font-weight:bold;
-    text-shadow:1px 1px 3px rgba(0,0,0,0.25);
+    text-shadow:0 1px 0 #fff, 0 2px 4px rgba(255,255,255,0.8);
     margin-bottom:28px;
   }
   .games{
@@ -118,11 +118,10 @@
 </head>
 <body>
 
-<div class="hero-banner">
-  <img src="assets/playground-bg.png" alt="Ilustração de um parquinho colorido com escorregador, balanço e gangorra">
-</div>
+<div class="scenery-bg" aria-hidden="true"></div>
+<div class="scenery-overlay" aria-hidden="true"></div>
 
-<h1>🎮 Cantinho dos Jogos 🎮</h1>
+<h1>Cantinho dos Jogos</h1>
 <p class="subtitle">Escolha um jogo para brincar com a família!</p>
 
 <div class="games">
