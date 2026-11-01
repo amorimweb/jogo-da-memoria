@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Trilha da Família</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sky-top:#8fd3f4; --sky-bottom:#eaf6e8; --sun:#ffd166; --cloud:#ffffff;
+    --mountain-far:#a9c4d6; --mountain-near:#7fa3b8; --forest:#3f8a52; --forest-dark:#2c6b3c;
+    --trunk:#7a5230; --path-road:#caa06a; --board:#fbf3dc; --board-edge:#e8d9ac;
+    --frame:#9a6b3c; --frame-dark:#7a5027; --ink:#2e2a26; --muted:#746a58;
+    --danger:#e2572b; --danger-soft:#ffe0d0; --treasure:#dba319; --treasure-soft:#fff1cf;
+    --start-c:#2f80c7; --start-soft:#d9ecfb; --tile:#fffdf6; --tile-border:#e6d7ab;
+    --shadow: 0 6px 16px rgba(70,45,10,0.18);
+    color-scheme: light;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:linear-gradient(var(--sky-bottom), var(--sky-bottom));
+    color:var(--ink);
+    font-family:'Nunito',system-ui,sans-serif;
+    margin:0;
+    padding:20px 16px;
+    min-height:100vh;
+    position:relative;
+  }
+  h1,h2,h3,.display{font-family:'Baloo 2','Nunito',system-ui,sans-serif;}
+
+  .scenery{position:fixed;inset:0;z-index:-1;overflow:hidden;background:linear-gradient(var(--sky-top), var(--sky-bottom) 70%);}
+  .sky-deco{position:absolute;top:0;left:0;width:100%;height:46%;display:block;}
+  .forest-deco{position:absolute;bottom:0;left:0;width:100%;height:16%;display:block;}
+
+  .wrap{max-width:860px;margin:0 auto;position:relative;}
+  .back-link{display:inline-block;color:var(--frame-dark);font-weight:800;text-decoration:none;margin-bottom:8px;}
+
+  .header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+  .header h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:800;color:var(--frame-dark);margin:0;
+    text-shadow: 0 2px 0 rgba(255,255,255,.5);}
+  .header p{margin:2px 0 0;color:var(--muted);font-size:.95rem;font-weight:700;}
+
+  .btn{
+    font-family:'Baloo 2',sans-serif;font-weight:700;font-size:1rem;
+    border:none;border-radius:14px;padding:10px 18px;cursor:pointer;
+    background:var(--start-c);color:#fff;box-shadow:var(--shadow);
+    transition:transform .15s ease;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn:active{transform:translateY(0);}
+  .btn.ghost{background:transparent;color:var(--frame-dark);box-shadow:none;border:2px solid var(--frame);}
+  .btn.small{padding:6px 12px;font-size:.85rem;border-radius:10px;}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  .card{
+    background:var(--board);border:3px solid var(--board-edge);border-radius:22px;
+    padding:24px;box-shadow:var(--shadow);margin-bottom:16px;
+  }
+  .card h2{margin:0 0 4px;font-size:1.3rem;color:var(--ink);}
+  .card .hint{color:var(--muted);margin:0 0 18px;font-size:.92rem;font-weight:700;}
+
+  /* mode choice */
+  .mode-options{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;}
+  .mode-card{
+    background:var(--tile);border:3px solid var(--tile-border);border-radius:18px;
+    padding:24px;width:220px;text-align:center;cursor:pointer;transition:transform .15s;
+  }
+  .mode-card:hover{transform:translateY(-4px); border-color:var(--start-c);}
+  .mode-card .emoji{font-size:48px;}
+  .mode-card h3{margin:8px 0 4px;}
+  .mode-card p{margin:0;font-size:13px;color:var(--muted);}
+
+  /* setup / players */
+  .player-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;}
+  .player-row input[type=text]{
+    flex:1;min-width:0;padding:10px 12px;border-radius:12px;border:2px solid var(--tile-border);
+    background:var(--tile);color:var(--ink);font:inherit;font-weight:700;
+  }
+  .color-dot{
+    width:34px;height:34px;border-radius:50%;flex:none;border:3px solid transparent;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;font-size:1rem;
+  }
+  .color-dot.active{border-color:var(--ink);transform:scale(1.08);}
+  .color-row{display:flex;gap:6px;flex:none;}
+  .setup-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;align-items:center;}
+  .count-stepper{display:flex;align-items:center;gap:8px;margin-bottom:18px;}
+  .count-stepper button{width:34px;height:34px;border-radius:50%;border:2px solid var(--start-c);background:transparent;color:var(--start-c);font-size:1.1rem;font-weight:800;cursor:pointer;}
+  .count-stepper span{font-weight:800;font-size:1.1rem;min-width:1.5em;text-align:center;}
+
+  /* online screens */
+  .tabs{display:flex;gap:10px;justify-content:center;margin-bottom:16px;}
+  .tab-btn{
+    background:var(--tile);color:var(--ink);box-shadow:none;border:3px solid var(--tile-border);
+    padding:8px 18px;border-radius:14px;font-family:'Baloo 2',sans-serif;font-weight:700;cursor:pointer;
+  }
+  .tab-btn.selected{border-color:var(--start-c); color:var(--start-c); background:var(--start-soft);}
+  .tab-panel{display:none;flex-direction:column;align-items:center;gap:12px;}
+  .tab-panel.active{display:flex;}
+  .text-input{
+    font-size:18px;padding:10px 14px;border-radius:12px;border:2px solid var(--tile-border);
+    width:220px;font-family:inherit;background:var(--tile);color:var(--ink);
+  }
+  .code-input{
+    font-size:28px;letter-spacing:6px;text-align:center;text-transform:uppercase;
+    padding:10px 14px;border-radius:12px;border:2px solid var(--tile-border);width:180px;
+    font-family:inherit;background:var(--tile);color:var(--ink);
+  }
+  .room-code{
+    font-size:40px;font-weight:bold;letter-spacing:6px;background:var(--start-soft);color:var(--start-c);
+    border-radius:14px;padding:10px 24px;text-align:center;
+  }
+  .lobby-players{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:14px 0;}
+  .lobby-chip{
+    display:flex;align-items:center;gap:8px;background:var(--tile);border-radius:30px;
+    padding:8px 16px 8px 8px;box-shadow:var(--shadow);border:3px solid var(--start-c);font-weight:700;
+  }
+  .lobby-chip .dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+  .lobby-chip.host::after{content:"👑";margin-left:4px;}
+  .error-text{color:var(--danger);font-weight:700;text-align:center;min-height:20px;}
+
+  /* ---------- GAME SCREEN ---------- */
+  .game-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+  .turn-banner{
+    background:var(--board);border:2px solid var(--board-edge);border-radius:16px;
+    padding:10px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px;
+    font-weight:800;font-family:'Baloo 2',sans-serif;
+  }
+  .turn-dot{width:24px;height:24px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:.9rem;}
+  .players-strip{display:flex;gap:8px;flex-wrap:wrap;}
+  .player-chip{
+    display:flex;align-items:center;gap:6px;background:var(--tile);border:1px solid var(--tile-border);
+    border-radius:999px;padding:5px 10px 5px 5px;font-size:.82rem;font-weight:700;box-shadow:var(--shadow);
+  }
+  .player-chip .dot{width:20px;height:20px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:.75rem;}
+  .player-chip.current{outline:2px solid var(--start-c);}
+
+  .board-area{position:relative;}
+  .board-frame{
+    background:linear-gradient(160deg, var(--frame), var(--frame-dark));
+    border-radius:24px;padding:10px;box-shadow:var(--shadow);
+  }
+  .board{
+    position:relative;display:grid;
+    grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(6,1fr);gap:4px;
+    background:
+      radial-gradient(ellipse at 20% 15%, rgba(255,255,255,.35), transparent 40%),
+      radial-gradient(ellipse at 80% 85%, rgba(170,130,60,.12), transparent 45%),
+      var(--board);
+    border-radius:18px;padding:12px;border:2px solid var(--board-edge);
+    aspect-ratio: 8 / 6;overflow:hidden;
+  }
+  .path-line{position:absolute;inset:12px;width:calc(100% - 24px);height:calc(100% - 24px);z-index:0;}
+  .path-line polyline{fill:none;stroke:var(--path-road);stroke-width:9;stroke-linecap:round;stroke-linejoin:round;
+    vector-effect:non-scaling-stroke;opacity:.6;stroke-dasharray:3 7;}
+
+  .tile{
+    position:relative;z-index:1;background:var(--tile);border:1px solid var(--tile-border);border-radius:12px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-width:0;min-height:0;font-weight:800;font-family:'Baloo 2',sans-serif;color:var(--muted);
+  }
+  .tile .num{font-size:clamp(.5rem,1.4vw,.7rem);opacity:.75;}
+  .tile .icon{font-size:clamp(.75rem,2.6vw,1.2rem);line-height:1;}
+  .tile.desafio{background:var(--danger-soft);border-color:var(--danger);color:var(--danger);}
+  .tile.prenda{background:var(--treasure-soft);border-color:var(--treasure);color:#8a6a10;}
+  .tile.start{background:var(--start-soft);border-color:var(--start-c);color:var(--start-c);}
+  .tile.fim{background:var(--treasure-soft);border-color:var(--treasure);color:#8a6a10;
+    box-shadow:0 0 0 3px rgba(219,163,25,.25);animation:glow 2.2s ease-in-out infinite;}
+  @keyframes glow{
+    0%,100%{box-shadow:0 0 0 3px rgba(219,163,25,.2);}
+    50%{box-shadow:0 0 0 7px rgba(219,163,25,.35);}
+  }
+
+  .token-layer{position:absolute;inset:12px;pointer-events:none;z-index:2;}
+  .token{
+    position:absolute;width:8%;aspect-ratio:1/1;border-radius:50%;
+    border:2px solid rgba(255,255,255,.9);box-shadow:0 2px 6px rgba(0,0,0,.35);
+    transform:translate(-50%,-50%);
+    transition: left .35s ease, top .35s ease;
+    display:flex;align-items:center;justify-content:center;font-size:clamp(.7rem,2.6vw,1.1rem);
+  }
+
+  .dice-dock{
+    position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;align-items:center;gap:6px;z-index:20;
+  }
+  .dice-label{
+    background:var(--board);border:2px solid var(--board-edge);border-radius:10px;
+    padding:3px 10px;font-size:.75rem;font-weight:700;color:var(--muted);box-shadow:var(--shadow);
+    max-width:140px;text-align:center;
+  }
+  .scene{width:72px;height:72px;perspective:400px;cursor:pointer;}
+  .scene.disabled{opacity:.4;cursor:not-allowed;}
+  .cube{position:relative;width:100%;height:100%;transform-style:preserve-3d;transform:rotateX(0deg) rotateY(0deg);transition:transform 0ms;}
+  .face{
+    position:absolute;width:72px;height:72px;background:linear-gradient(155deg, #c9985f, #a8703c);
+    border:2px solid var(--frame-dark);border-radius:14px;box-shadow:0 2px 6px rgba(0,0,0,.25) inset;
+    display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);padding:10px;
+  }
+  .pip{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+  .pip::after{content:"";width:62%;height:62%;border-radius:50%;background:#3a2410;display:block;}
+  .f-front{transform:translateZ(36px);}
+  .f-back{transform:rotateY(180deg) translateZ(36px);}
+  .f-right{transform:rotateY(90deg) translateZ(36px);}
+  .f-left{transform:rotateY(-90deg) translateZ(36px);}
+  .f-top{transform:rotateX(90deg) translateZ(36px);}
+  .f-bottom{transform:rotateX(-90deg) translateZ(36px);}
+  .scene.rolling .cube{transition:transform .9s cubic-bezier(.2,.8,.2,1);}
+  .scene:active .cube{filter:brightness(.97);}
+
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(20,15,5,.5);
+    display:flex;align-items:center;justify-content:center;padding:20px;z-index:50;
+  }
+  .modal{
+    background:var(--board);border-radius:20px;max-width:420px;width:100%;
+    padding:26px;box-shadow:var(--shadow);text-align:center;border:3px solid var(--board-edge);
+  }
+  .modal .emoji-big{font-size:2.6rem;display:block;margin-bottom:6px;}
+  .modal .badge{
+    display:inline-block;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:.85rem;
+    padding:4px 14px;border-radius:999px;margin-bottom:12px;
+  }
+  .modal.desafio .badge{background:var(--danger);color:#fff;}
+  .modal.prenda .badge{background:var(--treasure);color:#fff;}
+  .modal.win .badge{background:var(--treasure);color:#fff;}
+  .modal p.text{font-size:1.1rem;font-weight:700;margin:10px 0 20px;}
+  [hidden]{display:none!important;}
+
+  @media (max-width:520px){
+    .scene{width:58px;height:58px;}
+    .face{width:58px;height:58px;}
+    .f-front{transform:translateZ(29px);}
+    .f-back{transform:rotateY(180deg) translateZ(29px);}
+    .f-right{transform:rotateY(90deg) translateZ(29px);}
+    .f-left{transform:rotateY(-90deg) translateZ(29px);}
+    .f-top{transform:rotateX(90deg) translateZ(29px);}
+    .f-bottom{transform:rotateX(-90deg) translateZ(29px);}
+  }
+</style>
+</head>
+<body>
+
+<div class="scenery" aria-hidden="true">
+  <svg class="sky-deco" viewBox="0 0 400 120" preserveAspectRatio="none">
+    <circle cx="55" cy="34" r="22" style="fill:var(--sun)"/>
+    <g style="fill:var(--sun)" opacity=".55">
+      <line x1="55" y1="2" x2="55" y2="10" stroke="var(--sun)" stroke-width="3"/>
+      <line x1="55" y1="58" x2="55" y2="66" stroke="var(--sun)" stroke-width="3"/>
+      <line x1="19" y1="34" x2="11" y2="34" stroke="var(--sun)" stroke-width="3"/>
+      <line x1="91" y1="34" x2="99" y2="34" stroke="var(--sun)" stroke-width="3"/>
+    </g>
+    <g style="fill:var(--cloud)" opacity=".85">
+      <ellipse cx="190" cy="26" rx="26" ry="12"/>
+      <ellipse cx="212" cy="20" rx="18" ry="10"/>
+      <ellipse cx="330" cy="42" rx="24" ry="11"/>
+      <ellipse cx="352" cy="36" rx="16" ry="9"/>
+    </g>
+    <polygon points="0,120 55,38 115,120" style="fill:var(--mountain-far)"/>
+    <polygon points="90,120 170,22 255,120" style="fill:var(--mountain-far)"/>
+    <polygon points="225,120 300,48 385,120" style="fill:var(--mountain-far)"/>
+    <polygon points="-30,120 45,58 125,120" style="fill:var(--mountain-near)"/>
+    <polygon points="255,120 335,52 410,120" style="fill:var(--mountain-near)"/>
+  </svg>
+  <svg class="forest-deco" viewBox="0 0 400 60" preserveAspectRatio="none">
+    <defs>
+      <g id="pine">
+        <rect x="-3" y="38" width="6" height="14" style="fill:var(--trunk)"/>
+        <polygon points="0,6 -16,42 16,42" style="fill:var(--forest-dark)"/>
+        <polygon points="0,-2 -12,28 12,28" style="fill:var(--forest)"/>
+      </g>
+    </defs>
+    <use href="#pine" x="18" y="8" transform="scale(.85)"/>
+    <use href="#pine" x="55" y="2"/>
+    <use href="#pine" x="92" y="10" transform="scale(.9)"/>
+    <use href="#pine" x="130" y="0" transform="scale(1.1)"/>
+    <use href="#pine" x="168" y="8" transform="scale(.8)"/>
+    <use href="#pine" x="205" y="2"/>
+    <use href="#pine" x="243" y="10" transform="scale(.9)"/>
+    <use href="#pine" x="280" y="0" transform="scale(1.1)"/>
+    <use href="#pine" x="318" y="8" transform="scale(.85)"/>
+    <use href="#pine" x="355" y="2"/>
+    <use href="#pine" x="388" y="10" transform="scale(.8)"/>
+  </svg>
+</div>
+
+<div class="wrap">
+  <a class="back-link" href="../index.html">← Outros jogos</a>
+  <div class="header">
+    <div>
+      <h1>🧭 Trilha da Família</h1>
+      <p>Uma aventura por florestas e montanhas, cheia de perigos e tesouros!</p>
+    </div>
+  </div>
+
+  <!-- MODE SCREEN -->
+  <div id="mode-screen" class="screen active">
+    <div class="card">
+      <div class="mode-options">
+        <div class="mode-card" id="mode-local">
+          <span class="emoji">📱</span>
+          <h3>Mesmo aparelho</h3>
+          <p>Todos jogam juntos, passando a vez no mesmo celular ou tablet.</p>
+        </div>
+        <div class="mode-card" id="mode-online">
+          <span class="emoji">🌐</span>
+          <h3>Online (salas)</h3>
+          <p>Cada explorador usa seu próprio celular, em qualquer lugar!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOCAL SETUP -->
+  <div id="setup" class="screen">
+    <div class="card">
+      <h2>Quem vai nessa aventura?</h2>
+      <p class="hint">Escolha de 2 a 4 exploradores, dê um nome e um bichinho para cada um.</p>
+
+      <div class="count-stepper">
+        <button id="countMinus" type="button" aria-label="Menos jogadores">−</button>
+        <span id="countDisplay">2</span>
+        <button id="countPlus" type="button" aria-label="Mais jogadores">+</button>
+        <span style="color:var(--muted);font-weight:600;font-size:.85rem;margin-left:4px;">jogadores</span>
+      </div>
+
+      <div id="playerRows"></div>
+
+      <div class="setup-actions">
+        <button id="startBtn" class="btn" type="button">Começar a aventura 🧭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ONLINE SCREEN (criar / entrar) -->
+  <div id="online-screen" class="screen">
+    <div class="card">
+      <div class="tabs">
+        <button class="tab-btn selected" id="tab-create">➕ Criar sala</button>
+        <button class="tab-btn" id="tab-join">🔑 Entrar em sala</button>
+      </div>
+
+      <div class="tab-panel active" id="panel-create">
+        <input type="text" id="create-name" class="text-input" placeholder="Seu nome" maxlength="16">
+        <div class="color-row" id="create-avatar-picker"></div>
+        <button class="btn" id="create-room-btn">🚀 Criar sala</button>
+        <p class="error-text" id="create-error"></p>
+      </div>
+
+      <div class="tab-panel" id="panel-join">
+        <input type="text" id="join-code" class="code-input" placeholder="CÓDIGO" maxlength="5">
+        <input type="text" id="join-name" class="text-input" placeholder="Seu nome" maxlength="16">
+        <div class="color-row" id="join-avatar-picker"></div>
+        <button class="btn" id="join-room-btn">🔑 Entrar na sala</button>
+        <p class="error-text" id="join-error"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOBBY -->
+  <div id="lobby-screen" class="screen">
+    <div class="card" style="text-align:center;">
+      <h2>Acampamento de espera</h2>
+      <p class="hint">Compartilhe o código com a família:</p>
+      <div class="room-code" id="lobby-code">-----</div>
+    </div>
+    <div class="card">
+      <h2>👨‍👩‍👧‍👦 Exploradores na sala</h2>
+      <div class="lobby-players" id="lobby-players"></div>
+    </div>
+    <div class="card" id="lobby-host-options" style="display:none; text-align:center;">
+      <button class="btn" id="lobby-start-btn">🚀 Começar a aventura online</button>
+    </div>
+    <p class="hint" id="lobby-waiting-text" style="display:none; text-align:center;">Aguardando o anfitrião iniciar a aventura...</p>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="game" class="screen">
+    <div class="game-top">
+      <div class="turn-banner">
+        <span class="turn-dot" id="turnDot"></span>
+        <span id="turnText">Vez de ...</span>
+      </div>
+      <button id="newGameBtn" class="btn ghost small" type="button">Nova aventura</button>
+    </div>
+
+    <div class="players-strip" id="playersStrip" style="margin-bottom:12px;"></div>
+
+    <div class="board-area">
+      <div class="board-frame">
+        <div class="board" id="board"></div>
+      </div>
+      <div class="token-layer" id="tokenLayer"></div>
+    </div>
+  </div>
+</div>
+
+<div class="dice-dock" id="diceDock" hidden>
+  <div class="dice-label" id="diceHint">Role o dado da aventura!</div>
+  <div class="scene" id="diceScene" role="button" tabindex="0" aria-label="Jogar o dado">
+    <div class="cube" id="cube">
+      <div class="face f-front"><div></div><div></div><div></div><div></div><div class="pip"></div><div></div><div></div><div></div><div></div></div>
+      <div class="face f-top">
+        <div class="pip"></div><div></div><div class="pip"></div>
+        <div></div><div></div><div></div>
+        <div class="pip"></div><div></div><div class="pip"></div>
+      </div>
+      <div class="face f-right">
+        <div class="pip"></div><div></div><div></div>
+        <div></div><div class="pip"></div><div></div>
+        <div></div><div></div><div class="pip"></div>
+      </div>
+      <div class="face f-left">
+        <div class="pip"></div><div></div><div class="pip"></div>
+        <div></div><div></div><div></div>
+        <div class="pip"></div><div></div><div class="pip"></div>
+      </div>
+      <div class="face f-bottom">
+        <div class="pip"></div><div></div><div class="pip"></div>
+        <div class="pip"></div><div></div><div class="pip"></div>
+        <div class="pip"></div><div></div><div class="pip"></div>
+      </div>
+      <div class="face f-back">
+        <div class="pip"></div><div class="pip"></div><div class="pip"></div>
+        <div></div><div></div><div></div>
+        <div class="pip"></div><div class="pip"></div><div class="pip"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop" hidden>
+  <div class="modal" id="modalCard">
+    <span class="emoji-big" id="modalEmoji">🐉</span>
+    <div class="badge" id="modalBadge">Perigo</div>
+    <h3 id="modalTitle" style="margin:0 0 4px;">Nome</h3>
+    <p class="text" id="modalText">texto</p>
+    <button class="btn" id="modalBtn" type="button">Concluído</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="../shared/firebase-config.js"></script>
+<script src="../shared/online.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
