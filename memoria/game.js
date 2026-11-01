@@ -283,6 +283,7 @@ document.getElementById("create-room-btn").addEventListener("click", async () =>
     state.online.isHost = true;
     state.online.roomId = code;
     state.online.winnerShown = false;
+    OnlineRoom.trackPresence(myId);
     subscribeRoom();
     showScreen("lobby-screen");
   } catch (err) {
@@ -313,6 +314,7 @@ document.getElementById("join-room-btn").addEventListener("click", async () => {
     state.online.isHost = room.hostId === myId;
     state.online.roomId = OnlineRoom.roomId;
     state.online.winnerShown = false;
+    OnlineRoom.trackPresence(myId);
     subscribeRoom();
     showScreen("lobby-screen");
   } catch (err) {

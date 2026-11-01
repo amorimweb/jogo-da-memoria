@@ -270,6 +270,7 @@
       state.online.myId = myId;
       state.online.isHost = true;
       state.online.roomId = code;
+      OnlineRoom.trackPresence(myId);
       subscribeRoom();
       showScreen("lobby-screen");
     }).catch(function (err) {
@@ -297,6 +298,7 @@
         state.online.myId = myId;
         state.online.isHost = room.hostId === myId;
         state.online.roomId = OnlineRoom.roomId;
+        OnlineRoom.trackPresence(myId);
         subscribeRoom();
         showScreen("lobby-screen");
       });

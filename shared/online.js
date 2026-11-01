@@ -95,4 +95,31 @@ const OnlineRoom = {
     this.ref = null;
     this.roomId = null;
   },
+
+  /* Faz a sala se apagar sozinha quando o último jogador sai (fecha a
+     aba, navega pra fora, cai a conexão). Cada cliente arma uma
+     remoção da sala inteira no próprio disconnect sempre que percebe
+     que é o único presente; quando alguém mais entra, a remoção é
+     cancelada. Assim não depende de nenhum servidor/rotina externa. */
+  trackPresence(myId) {
+    if (!this.ref) return;
+    const roomRef = this.ref;
+    const presenceRef = roomRef.child("presence").child(myId);
+
+    db.ref(".info/connected").on("value", (snap) => {
+      if (snap.val() !== true) return;
+      presenceRef.onDisconnect().remove();
+      presenceRef.set(true);
+    });
+
+    roomRef.child("presence").on("value", (snap) => {
+      const vals = snap.val() || {};
+      const others = Object.keys(vals).filter((id) => id !== myId);
+      if (others.length === 0) {
+        roomRef.onDisconnect().remove();
+      } else {
+        roomRef.onDisconnect().cancel();
+      }
+    });
+  },
 };
