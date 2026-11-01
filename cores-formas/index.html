@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Caça ao Tesouro das Cores e Formas 🔷</title>
+<link rel="icon" href="../assets/favicon.ico">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<style>
+  :root{
+    --panel:#ffffffee;
+    --text:#2d2d4d;
+    --accent:#6c5ce7;
+    --accent2:#00cec9;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:'Comic Sans MS', 'Trebuchet MS', Arial, sans-serif;
+    background:linear-gradient(135deg,#a29bfe 0%,#81ecec 30%,#ffeaa7 60%,#fab1a0 100%);
+    background-size:400% 400%;
+    animation:bgMove 18s ease infinite;
+    color:var(--text);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:16px;
+  }
+  @keyframes bgMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+  .back-link{
+    align-self:flex-start;
+    color:#fff;
+    font-weight:bold;
+    text-decoration:none;
+    text-shadow:1px 1px 3px rgba(0,0,0,0.25);
+    margin-bottom:6px;
+  }
+  h1{
+    font-size:clamp(26px,6vw,42px);
+    text-align:center;
+    color:#fff;
+    text-shadow:3px 3px 0 var(--accent), -1px -1px 0 #fff2;
+    margin:10px 0 4px;
+  }
+  .subtitle{
+    text-align:center;
+    color:#fff;
+    font-weight:bold;
+    text-shadow:1px 1px 3px rgba(0,0,0,0.25);
+    margin-bottom:16px;
+  }
+  .screen{
+    width:100%;
+    max-width:900px;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+  }
+  .screen.active{display:flex;}
+  .panel{
+    background:var(--panel);
+    border-radius:var(--radius);
+    padding:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.2);
+    width:100%;
+  }
+
+  button{
+    font-family:inherit;
+    font-size:18px;
+    font-weight:bold;
+    padding:12px 22px;
+    border-radius:14px;
+    border:none;
+    cursor:pointer;
+    color:#fff;
+    background:linear-gradient(135deg,var(--accent),#a29bfe);
+    box-shadow:0 6px 0 #4b3fb3, 0 10px 18px rgba(0,0,0,0.2);
+    transition:transform .08s;
+  }
+  button:active{transform:translateY(4px); box-shadow:0 2px 0 #4b3fb3;}
+  button.secondary{
+    background:linear-gradient(135deg,var(--accent2),#55efc4);
+    box-shadow:0 6px 0 #00897b, 0 10px 18px rgba(0,0,0,0.2);
+  }
+  button.secondary:active{box-shadow:0 2px 0 #00897b;}
+  button:disabled{opacity:.5; cursor:not-allowed; box-shadow:none;}
+
+  /* setup */
+  .setup-form{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center; margin-bottom:14px;}
+  .setup-form input[type=text]{
+    font-size:18px; padding:10px 14px; border-radius:12px; border:3px solid var(--accent2); width:220px; font-family:inherit;
+  }
+  .avatar-picker{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; max-width:460px;}
+  .avatar-choice{
+    width:48px;height:48px; border-radius:50%; border:3px solid transparent; background:#fff;
+    display:flex;align-items:center;justify-content:center; cursor:pointer;
+    transition:transform .15s, border-color .15s; font-size:26px; line-height:1;
+  }
+  .avatar-choice:hover{transform:scale(1.12);}
+  .avatar-choice.selected{border-color:var(--accent); transform:scale(1.15); background:#f0eeff;}
+  .players-list{display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin:10px 0;}
+  .player-chip{
+    display:flex; align-items:center; gap:8px; background:#fff; border-radius:30px;
+    padding:6px 14px 6px 6px; box-shadow:0 4px 10px rgba(0,0,0,0.15); border:3px solid var(--accent2);
+  }
+  .player-chip .avatar-mini{font-size:26px; line-height:1;}
+  .player-chip button{background:#ff4d4d22; color:#e2572b; box-shadow:none; padding:4px 8px; font-size:14px; border-radius:50%;}
+  .level-options{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:10px 0;}
+  .level-chip{
+    padding:8px 16px; border-radius:20px; background:#fff; border:3px solid #ddd; cursor:pointer; font-weight:bold;
+  }
+  .level-chip.selected{border-color:var(--accent); background:#f0eeff; color:#4b3fb3;}
+  .start-actions{display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-top:10px;}
+
+  /* scoreboard */
+  .game-top{display:flex; justify-content:space-between; align-items:center; width:100%; gap:10px; flex-wrap:wrap;}
+  .scoreboard{display:flex; gap:10px; flex-wrap:wrap; justify-content:center;}
+  .score-chip{
+    display:flex; align-items:center; gap:6px; background:#fff; border-radius:20px; padding:6px 12px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.12); border:3px solid transparent; font-weight:bold;
+  }
+  .score-chip.current-turn{border-color:var(--accent); background:#f0eeff; transform:scale(1.07);}
+  .score-chip .avatar-mini{font-size:22px; line-height:1;}
+  .score-chip .pts{color:var(--accent2);}
+
+  /* game */
+  .round-counter{color:#746a58; font-weight:bold; text-align:center;}
+  .prompt-text{
+    text-align:center;
+    font-size:clamp(20px,4vw,28px);
+    font-weight:bold;
+    color:var(--accent);
+    margin:4px 0 12px;
+  }
+  .shapes-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(80px, 100px));
+    gap:14px;
+    justify-content:center;
+    margin:10px 0 18px;
+  }
+  .shape-tile{
+    width:100%;
+    aspect-ratio:1/1;
+    cursor:pointer;
+    border:none;
+    background:transparent;
+    padding:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:transform .1s;
+  }
+  .shape-tile:hover{transform:scale(1.06);}
+  .shape-tile:active{transform:scale(0.95);}
+  .shape-tile.disabled{opacity:.25; pointer-events:none;}
+  .shape-tile.shake{animation:shakeAnim .4s;}
+  @keyframes shakeAnim{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-8px);}
+    75%{transform:translateX(8px);}
+  }
+  .shape-tile.pop{animation:popAnim .4s ease;}
+  @keyframes popAnim{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.25);}
+    100%{transform:scale(1);}
+  }
+  .shape-inner{
+    width:85%;
+    height:85%;
+    box-shadow:0 6px 10px rgba(0,0,0,0.25);
+  }
+  .shape-circulo{ border-radius:50%; }
+  .shape-quadrado{ border-radius:10px; }
+  .shape-losango{ border-radius:6px; transform:rotate(45deg); width:65%; height:65%; }
+  .shape-triangulo{
+    clip-path:polygon(50% 0%, 0% 100%, 100% 100%);
+    box-shadow:none;
+    filter:drop-shadow(0 6px 6px rgba(0,0,0,0.25));
+  }
+  .shape-estrela{
+    clip-path:polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    box-shadow:none;
+    filter:drop-shadow(0 6px 6px rgba(0,0,0,0.25));
+  }
+  .shape-coracao{
+    clip-path:polygon(50% 15%, 61% 5%, 75% 5%, 90% 20%, 90% 38%, 50% 85%, 10% 38%, 10% 20%, 25% 5%, 39% 5%);
+    box-shadow:none;
+    filter:drop-shadow(0 6px 6px rgba(0,0,0,0.25));
+  }
+
+  .feedback-text{text-align:center; font-weight:bold; font-size:18px; min-height:28px;}
+  .feedback-text.correct{color:#00b894;}
+  .feedback-text.wrong{color:#e2572b;}
+
+  .confetti{position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:999;}
+  .confetti span{position:absolute; top:-20px; font-size:24px; animation:fall linear forwards;}
+  @keyframes fall{ to{ transform:translateY(110vh) rotate(360deg); opacity:0.9;} }
+
+  .winner-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.55); display:none;
+    align-items:center; justify-content:center; z-index:1000;
+  }
+  .winner-overlay.active{display:flex;}
+  .winner-box{
+    background:#fff; border-radius:24px; padding:30px 40px; text-align:center; max-width:90vw;
+    box-shadow:0 20px 50px rgba(0,0,0,0.3);
+  }
+  .winner-box h2{font-size:32px; color:var(--accent); margin-top:0;}
+  .winner-box .avatar-mini{font-size:72px; line-height:1; margin:10px auto;}
+  .footer-note{color:#fff; text-shadow:1px 1px 3px rgba(0,0,0,0.3); font-size:13px; margin-top:20px; text-align:center;}
+</style>
+</head>
+<body>
+
+<a class="back-link" href="../index.html">← Outros jogos</a>
+<h1>🔷 Caça ao Tesouro 🔶</h1>
+<p class="subtitle">Encontre a cor e a forma certas!</p>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen" class="screen active">
+  <div class="panel">
+    <h2>👧🧒 Jogadores</h2>
+    <div class="setup-form">
+      <input type="text" id="player-name" placeholder="Nome do jogador" maxlength="14">
+    </div>
+    <div class="avatar-picker" id="avatar-picker"></div>
+    <div class="start-actions">
+      <button class="secondary" id="add-player-btn">➕ Adicionar jogador</button>
+    </div>
+    <div class="players-list" id="players-list"></div>
+  </div>
+
+  <div class="panel">
+    <h2>🎯 Como procurar?</h2>
+    <div class="level-options" id="level-options"></div>
+  </div>
+
+  <div class="start-actions">
+    <button id="start-game-btn" disabled>🚀 Começar!</button>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game-screen" class="screen">
+  <div class="game-top">
+    <div class="scoreboard" id="scoreboard"></div>
+    <button class="secondary" id="restart-btn">🔄 Novo jogo</button>
+  </div>
+  <p class="round-counter" id="round-counter">Rodada 1 de 10</p>
+  <div class="panel" style="text-align:center;">
+    <p class="prompt-text" id="prompt-text">Encontre...</p>
+    <div class="shapes-grid" id="shapes-grid"></div>
+    <p class="feedback-text" id="feedback"></p>
+  </div>
+</div>
+
+<div class="winner-overlay" id="winner-overlay">
+  <div class="winner-box">
+    <h2 id="winner-title">🏆 Vencedor! 🏆</h2>
+    <div id="winner-avatar"></div>
+    <p id="winner-text" style="font-size:20px;font-weight:bold;"></p>
+    <button id="play-again-btn">🎮 Jogar de novo</button>
+  </div>
+</div>
+
+<p class="footer-note">Feito com 💖 para pequenos exploradores</p>
+
+<script src="game.js"></script>
+</body>
+</html>

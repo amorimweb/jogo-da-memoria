@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Mímica e Desenho Rápido 🎭</title>
+<link rel="icon" href="../assets/favicon.ico">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<style>
+  :root{
+    --panel:#ffffffee;
+    --text:#2d2d4d;
+    --accent:#ff5d8f;
+    --accent2:#7b61ff;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:'Comic Sans MS', 'Trebuchet MS', Arial, sans-serif;
+    background:linear-gradient(135deg,#ffd3e0 0%,#c9f0ff 30%,#fff3b0 60%,#d6c9ff 100%);
+    background-size:400% 400%;
+    animation:bgMove 18s ease infinite;
+    color:var(--text);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:16px;
+  }
+  @keyframes bgMove{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+  }
+  .back-link{
+    align-self:flex-start;
+    color:#fff;
+    font-weight:bold;
+    text-decoration:none;
+    text-shadow:1px 1px 3px rgba(0,0,0,0.25);
+    margin-bottom:6px;
+  }
+  h1{
+    font-size:clamp(26px,6vw,42px);
+    text-align:center;
+    color:#fff;
+    text-shadow:3px 3px 0 var(--accent), -1px -1px 0 #fff2;
+    margin:10px 0 4px;
+  }
+  .subtitle{
+    text-align:center;
+    color:#fff;
+    font-weight:bold;
+    text-shadow:1px 1px 3px rgba(0,0,0,0.25);
+    margin-bottom:16px;
+  }
+  .screen{
+    width:100%;
+    max-width:900px;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+  }
+  .screen.active{display:flex;}
+  .panel{
+    background:var(--panel);
+    border-radius:var(--radius);
+    padding:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.2);
+    width:100%;
+  }
+
+  button{
+    font-family:inherit;
+    font-size:18px;
+    font-weight:bold;
+    padding:12px 22px;
+    border-radius:14px;
+    border:none;
+    cursor:pointer;
+    color:#fff;
+    background:linear-gradient(135deg,var(--accent),#ff8fab);
+    box-shadow:0 6px 0 #c71f55, 0 10px 18px rgba(0,0,0,0.2);
+    transition:transform .08s;
+  }
+  button:active{transform:translateY(4px); box-shadow:0 2px 0 #c71f55;}
+  button.secondary{
+    background:linear-gradient(135deg,var(--accent2),#9d8bff);
+    box-shadow:0 6px 0 #4c3bb0, 0 10px 18px rgba(0,0,0,0.2);
+  }
+  button.secondary:active{box-shadow:0 2px 0 #4c3bb0;}
+  button.success{
+    background:linear-gradient(135deg,#2ec4b6,#5ee7df);
+    box-shadow:0 6px 0 #1a7d73, 0 10px 18px rgba(0,0,0,0.2);
+  }
+  button.success:active{box-shadow:0 2px 0 #1a7d73;}
+  button:disabled{opacity:.5; cursor:not-allowed; box-shadow:none;}
+
+  /* submode choice */
+  .submode-options{display:flex; gap:16px; flex-wrap:wrap; justify-content:center;}
+  .submode-card{
+    background:#fff; border-radius:18px; padding:24px; width:240px; text-align:center;
+    cursor:pointer; border:4px solid transparent; box-shadow:0 8px 20px rgba(0,0,0,0.15);
+    transition:transform .15s;
+  }
+  .submode-card:hover{transform:translateY(-4px); border-color:var(--accent2);}
+  .submode-card.selected{border-color:var(--accent);}
+  .submode-card .emoji{font-size:48px;}
+  .submode-card h3{margin:8px 0 4px;}
+  .submode-card p{margin:0; font-size:13px; color:#746a58;}
+
+  /* setup */
+  .setup-form{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center; margin-bottom:14px;}
+  .setup-form input[type=text]{
+    font-size:18px; padding:10px 14px; border-radius:12px; border:3px solid var(--accent2); width:220px; font-family:inherit;
+  }
+  .avatar-picker{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; max-width:460px;}
+  .avatar-choice{
+    width:48px;height:48px; border-radius:50%; border:3px solid transparent; background:#fff;
+    display:flex;align-items:center;justify-content:center; cursor:pointer;
+    transition:transform .15s, border-color .15s; font-size:26px; line-height:1;
+  }
+  .avatar-choice:hover{transform:scale(1.12);}
+  .avatar-choice.selected{border-color:var(--accent); transform:scale(1.15); background:#fff0f3;}
+  .players-list{display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin:10px 0;}
+  .player-chip{
+    display:flex; align-items:center; gap:8px; background:#fff; border-radius:30px;
+    padding:6px 14px 6px 6px; box-shadow:0 4px 10px rgba(0,0,0,0.15); border:3px solid var(--accent2);
+  }
+  .player-chip .avatar-mini{font-size:26px; line-height:1;}
+  .player-chip button{background:#ff4d4d22; color:#e2572b; box-shadow:none; padding:4px 8px; font-size:14px; border-radius:50%;}
+  .category-options{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:10px 0;}
+  .category-chip{
+    padding:8px 16px; border-radius:20px; background:#fff; border:3px solid #ddd; cursor:pointer; font-weight:bold;
+  }
+  .category-chip.selected{border-color:var(--accent); background:#fff0f3; color:var(--accent);}
+  .start-actions{display:flex; justify-content:center; gap:12px; flex-wrap:wrap; margin-top:10px;}
+
+  /* scoreboard (shared) */
+  .game-top{display:flex; justify-content:space-between; align-items:center; width:100%; gap:10px; flex-wrap:wrap;}
+  .scoreboard{display:flex; gap:10px; flex-wrap:wrap; justify-content:center;}
+  .score-chip{
+    display:flex; align-items:center; gap:6px; background:#fff; border-radius:20px; padding:6px 12px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.12); border:3px solid transparent; font-weight:bold;
+  }
+  .score-chip.current-turn{border-color:var(--accent); background:#fff0f3; transform:scale(1.07);}
+  .score-chip .avatar-mini{font-size:22px; line-height:1;}
+  .score-chip .pts{color:var(--accent2);}
+
+  /* ---- Passe o celular ---- */
+  .round-counter{color:#746a58; font-weight:bold; text-align:center;}
+  .pass-card{text-align:center;}
+  .pass-card .avatar-big{font-size:80px; line-height:1;}
+  .pass-card h2{margin:6px 0;}
+  .pass-card p{color:#746a58; font-weight:bold;}
+
+  /* ---- Round screen ---- */
+  .round-card{text-align:center;}
+  .hide-warning{
+    color:#e2572b; font-weight:bold; background:#ffe0d0; border-radius:12px; padding:8px 14px;
+    display:inline-block; margin-bottom:10px;
+  }
+  .secret-emoji{font-size:90px; line-height:1;}
+  .secret-word{font-size:clamp(24px,5vw,36px); font-weight:bold; color:var(--accent2); margin:4px 0 16px;}
+  .timer-bar-outer{
+    width:100%; max-width:400px; height:22px; background:#eee; border-radius:12px; margin:0 auto 18px;
+    overflow:hidden; border:2px solid #ddd;
+  }
+  .timer-bar-inner{
+    height:100%; background:linear-gradient(135deg,var(--accent2),#9d8bff); width:100%;
+    transition:width 1s linear;
+  }
+  .timer-text{font-weight:bold; margin-bottom:14px; font-size:20px;}
+  .round-actions{display:flex; gap:14px; justify-content:center; flex-wrap:wrap;}
+  .skip-count{color:#746a58; font-size:13px; font-weight:bold; margin-top:10px;}
+
+  .confetti{position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:999;}
+  .confetti span{position:absolute; top:-20px; font-size:24px; animation:fall linear forwards;}
+  @keyframes fall{ to{ transform:translateY(110vh) rotate(360deg); opacity:0.9;} }
+
+  .winner-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.55); display:none;
+    align-items:center; justify-content:center; z-index:1000;
+  }
+  .winner-overlay.active{display:flex;}
+  .winner-box{
+    background:#fff; border-radius:24px; padding:30px 40px; text-align:center; max-width:90vw;
+    box-shadow:0 20px 50px rgba(0,0,0,0.3);
+  }
+  .winner-box h2{font-size:32px; color:var(--accent); margin-top:0;}
+  .winner-box .avatar-mini{font-size:72px; line-height:1; margin:10px auto;}
+  .footer-note{color:#fff; text-shadow:1px 1px 3px rgba(0,0,0,0.3); font-size:13px; margin-top:20px; text-align:center;}
+</style>
+</head>
+<body>
+
+<a class="back-link" href="../index.html">← Outros jogos</a>
+<h1>🎭 Mímica e Desenho Rápido 🎭</h1>
+<p class="subtitle">Adivinhem a palavra secreta antes do tempo acabar!</p>
+
+<!-- SUBMODE SCREEN -->
+<div id="submode-screen" class="screen active">
+  <div class="panel">
+    <div class="submode-options">
+      <div class="submode-card" id="submode-mimica">
+        <span class="emoji">🎭</span>
+        <h3>Mímica</h3>
+        <p>Atue a palavra secreta sem falar nada, só com gestos!</p>
+      </div>
+      <div class="submode-card" id="submode-desenho">
+        <span class="emoji">✏️</span>
+        <h3>Desenho Rápido</h3>
+        <p>Desenhe a palavra secreta no papel para a família adivinhar!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen" class="screen">
+  <div class="panel">
+    <h2>👧🧒 Jogadores</h2>
+    <div class="setup-form">
+      <input type="text" id="player-name" placeholder="Nome do jogador" maxlength="14">
+    </div>
+    <div class="avatar-picker" id="avatar-picker"></div>
+    <div class="start-actions">
+      <button class="secondary" id="add-player-btn">➕ Adicionar jogador</button>
+    </div>
+    <div class="players-list" id="players-list"></div>
+  </div>
+
+  <div class="panel">
+    <h2>🎨 Categorias</h2>
+    <div class="category-options" id="category-options"></div>
+  </div>
+
+  <div class="start-actions">
+    <button id="start-game-btn" disabled>🚀 Começar!</button>
+  </div>
+</div>
+
+<!-- PASS SCREEN -->
+<div id="pass-screen" class="screen">
+  <div class="panel pass-card">
+    <p class="round-counter" id="pass-round-counter">Rodada 1 de 8</p>
+    <div class="avatar-big" id="pass-avatar">🙈</div>
+    <h2 id="pass-text">Passe o celular para Ana!</h2>
+    <p>Prontos? Esconda a palavra dos outros jogadores.</p>
+    <button id="reveal-btn">👀 Revelar palavra</button>
+  </div>
+</div>
+
+<!-- ROUND SCREEN -->
+<div id="round-screen" class="screen">
+  <div class="game-top">
+    <div class="scoreboard" id="round-scoreboard"></div>
+    <button class="secondary" id="round-restart-btn">🔄 Novo jogo</button>
+  </div>
+  <div class="panel round-card">
+    <p class="hide-warning">📵 Esconda a tela dos outros!</p>
+    <div class="secret-emoji" id="secret-emoji">🐶</div>
+    <div class="secret-word" id="secret-word">CACHORRO</div>
+    <div class="timer-bar-outer"><div class="timer-bar-inner" id="timer-bar"></div></div>
+    <p class="timer-text" id="timer-text">⏱️ 60s</p>
+    <div class="round-actions">
+      <button class="success" id="correct-btn">✅ Acertaram!</button>
+      <button class="secondary" id="skip-btn">⏭️ Pular</button>
+    </div>
+    <p class="skip-count" id="skip-count"></p>
+  </div>
+</div>
+
+<div class="winner-overlay" id="winner-overlay">
+  <div class="winner-box">
+    <h2 id="winner-title">🏆 Vencedor! 🏆</h2>
+    <div id="winner-avatar"></div>
+    <p id="winner-text" style="font-size:20px;font-weight:bold;"></p>
+    <button id="play-again-btn">🎮 Jogar de novo</button>
+  </div>
+</div>
+
+<p class="footer-note">Feito com 💖 para a família</p>
+
+<script src="words.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
