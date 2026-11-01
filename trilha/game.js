@@ -221,6 +221,31 @@
     document.getElementById("panel-join").classList.toggle("active", which === "join");
   }
 
+  var googleUser = null;
+  GoogleAuth.init(function (user) {
+    googleUser = user;
+    var statusEl = document.getElementById("google-signin-status");
+    var btnEl = document.getElementById("google-signin-btn");
+    var nameInput = document.getElementById("create-name");
+    if (user) {
+      statusEl.style.display = "block";
+      statusEl.textContent = "✅ Conectado como " + user.email;
+      btnEl.style.display = "none";
+      if (!nameInput.value) nameInput.value = (user.displayName || "").split(" ")[0] || "";
+    } else {
+      statusEl.style.display = "none";
+      btnEl.style.display = "inline-block";
+    }
+  });
+
+  document.getElementById("google-signin-btn").addEventListener("click", function () {
+    var errorEl = document.getElementById("create-error");
+    errorEl.textContent = "";
+    GoogleAuth.signIn().catch(function () {
+      errorEl.textContent = "Não foi possível entrar com Google.";
+    });
+  });
+
   document.getElementById("create-room-btn").addEventListener("click", function () {
     var errorEl = document.getElementById("create-error");
     errorEl.textContent = "";
@@ -231,6 +256,8 @@
     var initialData = {
       status: "lobby",
       hostId: myId,
+      hostVerified: !!googleUser,
+      hostEmail: googleUser ? googleUser.email : null,
       turnIndex: 0,
       finished: false,
       playerOrder: [myId],
@@ -312,6 +339,7 @@
 
   function renderLobby(room) {
     document.getElementById("lobby-code").textContent = state.online.roomId || "-----";
+    document.getElementById("lobby-verified-badge").style.display = room.hostVerified ? "block" : "none";
     var listEl = document.getElementById("lobby-players");
     listEl.innerHTML = "";
     state.players.forEach(function (p) {

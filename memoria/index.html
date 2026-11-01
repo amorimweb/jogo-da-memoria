@@ -464,6 +464,8 @@
     </div>
 
     <div class="tab-panel active" id="panel-create">
+      <button class="secondary" id="google-signin-btn">🔐 Entrar com Google</button>
+      <p class="hint" id="google-signin-status" style="display:none;"></p>
       <input type="text" id="create-name" class="setup-form" placeholder="Seu nome" maxlength="14" style="font-size:18px;padding:10px 14px;border-radius:12px;border:3px solid var(--accent2);width:220px;font-family:inherit;">
       <div class="avatar-picker" id="create-avatar-picker"></div>
       <button id="create-room-btn">🚀 Criar sala</button>
@@ -486,6 +488,7 @@
     <h2>Sala de espera</h2>
     <p class="hint">Compartilhe o código com a família:</p>
     <div class="room-code" id="lobby-code">-----</div>
+    <p class="hint" id="lobby-verified-badge" style="display:none; color:#238b84;">✅ Sala criada por um adulto verificado (login Google)</p>
   </div>
 
   <div class="panel">
@@ -558,6 +561,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="../shared/firebase-config.js"></script>
 <script src="../shared/online.js"></script>
 <script src="icons.js"></script>

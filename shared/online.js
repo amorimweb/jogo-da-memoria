@@ -5,6 +5,31 @@
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+const auth = firebase.auth();
+
+/* Login com Google — usado apenas por quem CRIA a sala (o adulto
+   responsável), para dar um mínimo de rastreabilidade sem exigir
+   conta das crianças, que entram só com nome + avatar. */
+const GoogleAuth = {
+  currentUser: null,
+
+  init(onChange) {
+    auth.onAuthStateChanged((user) => {
+      this.currentUser = user;
+      onChange(user);
+    });
+  },
+
+  async signIn() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    const result = await auth.signInWithPopup(provider);
+    return result.user;
+  },
+
+  signOut() {
+    return auth.signOut();
+  },
+};
 
 const ROOM_CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // sem O/0/I/1 para evitar confusão
 

@@ -227,6 +227,33 @@ function renderJoinAvatarPicker() {
   });
 }
 
+let googleUser = null;
+GoogleAuth.init((user) => {
+  googleUser = user;
+  const statusEl = document.getElementById("google-signin-status");
+  const btnEl = document.getElementById("google-signin-btn");
+  const nameInput = document.getElementById("create-name");
+  if (user) {
+    statusEl.style.display = "block";
+    statusEl.textContent = `✅ Conectado como ${user.email}`;
+    btnEl.style.display = "none";
+    if (!nameInput.value) nameInput.value = (user.displayName || "").split(" ")[0] || "";
+  } else {
+    statusEl.style.display = "none";
+    btnEl.style.display = "inline-block";
+  }
+});
+
+document.getElementById("google-signin-btn").addEventListener("click", async () => {
+  const errorEl = document.getElementById("create-error");
+  errorEl.textContent = "";
+  try {
+    await GoogleAuth.signIn();
+  } catch (err) {
+    errorEl.textContent = "Não foi possível entrar com Google.";
+  }
+});
+
 document.getElementById("create-room-btn").addEventListener("click", async () => {
   const errorEl = document.getElementById("create-error");
   errorEl.textContent = "";
@@ -237,6 +264,8 @@ document.getElementById("create-room-btn").addEventListener("click", async () =>
   const initialData = {
     status: "lobby",
     hostId: myId,
+    hostVerified: !!googleUser,
+    hostEmail: googleUser ? googleUser.email : null,
     theme: ["mix"],
     boardSize: 12,
     turnIndex: 0,
@@ -331,6 +360,7 @@ function applyRoomState(room) {
 
 function renderLobby(room) {
   document.getElementById("lobby-code").textContent = state.online.roomId || "-----";
+  document.getElementById("lobby-verified-badge").style.display = room.hostVerified ? "block" : "none";
 
   const listEl = document.getElementById("lobby-players");
   listEl.innerHTML = "";
