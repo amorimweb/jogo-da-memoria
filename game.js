@@ -188,7 +188,7 @@ function renderBoard() {
   const boardEl = document.getElementById("board");
   boardEl.innerHTML = "";
 
-  const cols = state.boardSize <= 12 ? 4 : state.boardSize <= 16 ? 4 : state.boardSize <= 20 ? 5 : 6;
+  const cols = state.boardSize <= 12 ? 4 : state.boardSize <= 16 ? 4 : state.boardSize <= 20 ? 5 : 4;
   boardEl.style.gridTemplateColumns = `repeat(${cols}, minmax(60px, 110px))`;
 
   state.cards.forEach((card, idx) => {
