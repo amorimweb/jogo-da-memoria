@@ -1,7 +1,7 @@
 /* Quebra-Cabeça dos Bichos — sliding puzzle (8-puzzle) com emojis de animais */
 
 const AVATARS = ["😺","🐶","🐵","🦁","🐸","🐧","🦄","🐙","🐻","🐰","🦋","🐢","🐼","🦊","🐯","🐮"];
-const ANIMALS = ["🐶","🐱","🐰","🦊","🐻","🐼","🐯","🦁"]; // 8 bichos + 1 espaço vazio
+const ANIMAL_POOL = ["🐶","🐱","🐰","🦊","🐻","🐼","🐯","🦁","🐸","🐵","🐨","🐮","🐷","🐔","🦄","🐙"];
 const BLANK = -1;
 const SOLVED = [0, 1, 2, 3, 4, 5, 6, 7, BLANK];
 const TOTAL_ROUNDS = 5;
@@ -13,7 +13,17 @@ const state = {
   board: [],
   round: 0,
   locked: false,
+  animals: [], // 8 bichos sorteados (ordem/escolha muda a cada rodada)
 };
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 function showScreen(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
@@ -85,7 +95,6 @@ startBtn.addEventListener("click", () => {
   state.round = 0;
   showScreen("game-screen");
   renderScoreboard();
-  renderReferenceStrip();
   startRound();
 });
 
@@ -160,7 +169,7 @@ function renderReferenceStrip() {
   SOLVED.forEach(value => {
     const cell = document.createElement("div");
     cell.className = "ref-cell";
-    cell.textContent = value === BLANK ? "" : ANIMALS[value];
+    cell.textContent = value === BLANK ? "" : state.animals[value];
     strip.appendChild(cell);
   });
 }
@@ -208,10 +217,12 @@ function shuffleBoard() {
 }
 
 function startRound() {
+  state.animals = shuffle(ANIMAL_POOL).slice(0, 8);
   state.board = shuffleBoard();
   state.locked = false;
   document.getElementById("round-counter").textContent = `Rodada ${state.round + 1} de ${TOTAL_ROUNDS}`;
   document.getElementById("round-feedback").textContent = "";
+  renderReferenceStrip();
   renderPuzzleBoard();
 }
 
@@ -224,7 +235,7 @@ function renderPuzzleBoard() {
     const tile = document.createElement("div");
     const blank = value === BLANK;
     tile.className = "puzzle-tile" + (blank ? " blank" : "") + (!blank && !isAdjacent(pos, blankPos) ? " not-adjacent" : "");
-    tile.textContent = blank ? "" : ANIMALS[value];
+    tile.textContent = blank ? "" : state.animals[value];
     if (!blank) tile.addEventListener("click", () => onTileClick(pos));
     boardEl.appendChild(tile);
   });
