@@ -104,20 +104,23 @@ function updateStartBtn() {
   startBtn.disabled = state.players.length < 1;
 }
 
-document.getElementById("add-player-btn").addEventListener("click", addPlayer);
+document.getElementById("add-player-btn").addEventListener("click", () => addPlayer());
 document.getElementById("player-name").addEventListener("keydown", e => {
   if (e.key === "Enter") addPlayer();
 });
 
-function addPlayer() {
+function addPlayer(presetName, presetAvatar) {
   const input = document.getElementById("player-name");
-  const name = input.value.trim();
+  const name = (presetName || input.value).trim();
+  const avatar = presetAvatar || state.selectedAvatar;
   if (!name) { input.focus(); return; }
   if (state.players.length >= 8) { alert("Máximo de 8 jogadores!"); return; }
-  state.players.push({ name, avatar: state.selectedAvatar, score: 0 });
+  state.players.push({ name, avatar, score: 0 });
   input.value = "";
+  PlayersCache.add(name, avatar);
   renderPlayersList();
   updateStartBtn();
+  renderRecentPlayers("recent-players", (p) => addPlayer(p.name, p.avatar));
 }
 
 function renderLevelOptions() {
@@ -328,3 +331,4 @@ renderAvatarPicker();
 renderPlayersList();
 renderLevelOptions();
 updateStartBtn();
+renderRecentPlayers("recent-players", (p) => addPlayer(p.name, p.avatar));

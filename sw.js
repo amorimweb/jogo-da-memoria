@@ -6,7 +6,7 @@
    (dados ao vivo das salas online) nunca são cacheadas — sempre vão
    direto pra rede. */
 
-const CACHE_VERSION = "v2";
+const CACHE_VERSION = "v3";
 const CACHE_NAME = "cantinho-dos-jogos-" + CACHE_VERSION;
 
 const PRECACHE_URLS = [
