@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Sem conexão — Cantinho dos Jogos</title>
+<link rel="icon" href="/assets/favicon.ico">
+<style>
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family:'Comic Sans MS', 'Trebuchet MS', Arial, sans-serif;
+    background:linear-gradient(135deg,#a8edea 0%,#fed6e3 30%,#ffecd2 60%,#fcb69f 100%);
+    color:#2d2d4d;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:24px;
+  }
+  .emoji{font-size:80px;}
+  h1{font-size:28px;margin:10px 0 6px;}
+  p{font-size:16px;color:#5a5a6e;max-width:360px;}
+  button{
+    margin-top:18px;
+    font-family:inherit;
+    font-size:18px;
+    font-weight:bold;
+    padding:12px 24px;
+    border-radius:14px;
+    border:none;
+    cursor:pointer;
+    color:#fff;
+    background:linear-gradient(135deg,#ff9f1c,#ffbf69);
+    box-shadow:0 6px 0 #c77600;
+  }
+  button:active{transform:translateY(4px); box-shadow:0 2px 0 #c77600;}
+  a{color:#2ec4b6;font-weight:bold;}
+</style>
+</head>
+<body>
+  <div class="emoji">📡</div>
+  <h1>Ops, sem internet!</h1>
+  <p>Essa página ainda não tinha sido visitada com o celular online, então não dá pra abrir agora. Os jogos que você já abriu antes continuam funcionando offline — volte para o <a href="/index.html">Cantinho dos Jogos</a>.</p>
+  <button onclick="location.reload()">🔄 Tentar de novo</button>
+</body>
+</html>
