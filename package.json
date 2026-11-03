@@ -1,0 +1,30 @@
+{
+  "name": "cantinho-dos-jogos",
+  "version": "1.0.0",
+  "description": "Jogo da memória colorido e divertido para crianças, feito em HTML/CSS/JS puro (sem dependências externas).",
+  "main": "sw.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amorimweb/jogo-da-memoria.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/amorimweb/jogo-da-memoria/issues"
+  },
+  "homepage": "https://github.com/amorimweb/jogo-da-memoria#readme",
+  "dependencies": {
+    "@capacitor/cli": "^8.6.0",
+    "@capacitor/core": "^8.6.0",
+    "@capacitor/ios": "^8.6.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^4.0.0",
+    "sharp": "^0.35.5"
+  }
+}
