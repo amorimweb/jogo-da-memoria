@@ -37,8 +37,22 @@ workflows:
           ls -la ~/.appstoreconnect/private_keys/ 2>&1 || echo "(missing)"
           echo "--- relevant env var NAMES only ---"
           env | grep -iE "APP_STORE|ASC_|CM_.*KEY|CM_.*CERT|CM_.*TEAM|CM_.*ISSUER" | sed 's/=.*/=<hidden>/'
-      - name: Build ipa for distribution (automatic signing via Xcode)
+      - name: Build ipa for distribution (plain xcodebuild, automatic signing)
         script: |
+          mkdir -p build/ios/xcarchive build/ios/ipa
+          KEY_PATH="$HOME/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_KEY_IDENTIFIER}.p8"
+
+          xcodebuild archive \
+            -project "$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME" \
+            -archivePath build/ios/xcarchive/App.xcarchive \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$KEY_PATH" \
+            -authenticationKeyID "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
+            -authenticationKeyIssuerID "$APP_STORE_CONNECT_ISSUER_ID" \
+            CODE_SIGN_STYLE=Automatic \
+            DEVELOPMENT_TEAM="$TEAM_ID"
+
           cat > /tmp/export_options.plist <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -53,12 +67,15 @@ workflows:
           </dict>
           </plist>
           EOF
-          KEY_PATH="$HOME/.appstoreconnect/private_keys/AuthKey_${APP_STORE_CONNECT_KEY_IDENTIFIER}.p8"
-          xcode-project build-ipa \
-            --project "$XCODE_PROJECT" \
-            --scheme "$XCODE_SCHEME" \
-            --archive-flags="-allowProvisioningUpdates CODE_SIGN_STYLE=Automatic DEVELOPMENT_TEAM=$TEAM_ID -authenticationKeyPath $KEY_PATH -authenticationKeyID $APP_STORE_CONNECT_KEY_IDENTIFIER -authenticationKeyIssuerID $APP_STORE_CONNECT_ISSUER_ID" \
-            --export-options-plist /tmp/export_options.plist
+
+          xcodebuild -exportArchive \
+            -archivePath build/ios/xcarchive/App.xcarchive \
+            -exportPath build/ios/ipa \
+            -exportOptionsPlist /tmp/export_options.plist \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$KEY_PATH" \
+            -authenticationKeyID "$APP_STORE_CONNECT_KEY_IDENTIFIER" \
+            -authenticationKeyIssuerID "$APP_STORE_CONNECT_ISSUER_ID"
     artifacts:
       - build/ios/ipa/*.ipa
       - /tmp/xcodebuild_logs/*.log
