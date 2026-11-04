@@ -31,6 +31,12 @@ workflows:
           cd $CM_BUILD_DIR/ios/App
           LATEST_BUILD_NUMBER=$(app-store-connect get-latest-build-number "$BUNDLE_ID" || echo 0)
           agvtool new-version -all $(($LATEST_BUILD_NUMBER + 1))
+      - name: Debug signing environment (no secrets printed)
+        script: |
+          echo "--- private_keys dir ---"
+          ls -la ~/.appstoreconnect/private_keys/ 2>&1 || echo "(missing)"
+          echo "--- relevant env var NAMES only ---"
+          env | grep -iE "APP_STORE|ASC_|CM_.*KEY|CM_.*CERT|CM_.*TEAM|CM_.*ISSUER" | sed 's/=.*/=<hidden>/'
       - name: Build ipa for distribution (automatic signing via Xcode)
         script: |
           cat > /tmp/export_options.plist <<EOF
