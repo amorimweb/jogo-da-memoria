@@ -28,7 +28,11 @@ workflows:
       - name: Set up code signing (fetch/create certs + profile, via App Store Connect integration)
         script: |
           keychain initialize
-          app-store-connect fetch-signing-files "$BUNDLE_ID" --type IOS_APP_STORE --create
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --certificate-type IOS_DISTRIBUTION \
+            --create \
+            --verbose
           keychain add-certificates
           xcode-project use-profiles
       - name: Increment build number
