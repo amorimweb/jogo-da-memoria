@@ -7,12 +7,11 @@ workflows:
       app_store_connect: Echos
     environment:
       vars:
-        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
+        XCODE_PROJECT: "ios/App/App.xcodeproj"
         XCODE_SCHEME: "App"
         BUNDLE_ID: "com.amorimweb.cantinhodosjogos"
       node: 22
       xcode: latest
-      cocoapods: default
     triggering:
       events:
         - push
@@ -26,9 +25,6 @@ workflows:
         script: node scripts/build-www.js
       - name: Capacitor sync
         script: npx cap sync ios
-      - name: Install CocoaPods dependencies
-        script: |
-          cd ios/App && pod install
       - name: Set up code signing (automatic, via App Store Connect integration)
         script: |
           xcode-project use-profiles
@@ -40,7 +36,7 @@ workflows:
       - name: Build ipa for distribution
         script: |
           xcode-project build-ipa \
-            --workspace "$XCODE_WORKSPACE" \
+            --project "$XCODE_PROJECT" \
             --scheme "$XCODE_SCHEME"
     artifacts:
       - build/ios/ipa/*.ipa
